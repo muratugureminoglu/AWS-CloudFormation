@@ -106,7 +106,7 @@ Resources:
           - !GetAtt TestSecurityGroup.GroupId
         Tags:
         - Key: Name
-          Value: Test
+          Value: ${AWS::StackName}
         UserData:
           Fn::Base64: !Sub |
             #!/bin/bash
@@ -133,3 +133,8 @@ Outputs:
     Description: Elastic IP Address
     Condition: CreateIP
     Value: !Ref ElasticIP
+  PublicIPV4:
+    Description: Public IP Address
+    Value: !GetAtt TestInstance.PublicIp
+    Export:
+      Name: !Sub "${AWS::StackName}-PublicIp"
