@@ -81,10 +81,6 @@ Parameters:
       - cc2.8xlarge
       - cg1.4xlarge
     ConstraintDescription: must be a valid EC2 instance type.
-  STUNServerAddress:
-    Description: 'STUN/TURN Server Domain Name'
-    Type: String
-    Default: ''
   UserName:
     Description: 'STUN/TURN Server Username'
     Type: String
@@ -102,6 +98,10 @@ Parameters:
     ConstraintDescription: can contain only ASCII characters.
 
 Resources:
+  ElasticIP:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: "vpc"
   DescribeImagesRole:
     Type: AWS::IAM::Role
     Properties:
@@ -125,7 +125,7 @@ Resources:
   GetLatestAMI:
     Type: AWS::Lambda::Function
     Properties:
-      Runtime: python3.6
+      Runtime: python3.11
       Handler: index.handler
       Role: !Sub ${DescribeImagesRole.Arn}
       Timeout: 60
@@ -182,6 +182,10 @@ Resources:
           FromPort: '3478'
           ToPort: '3478'
           CidrIp: 0.0.0.0/0
+        - IpProtocol: udp
+          FromPort: '49152'
+          ToPort: '65535'
+          CidrIp: 0.0.0.0/0
       VpcId: !Ref VpcId
   TurnServerInstance:
       Type: 'AWS::EC2::Instance'
@@ -203,7 +207,7 @@ Resources:
             sed -i 's/#TURNSERVER.*/TURNSERVER_ENABLED=1/g' /etc/default/coturn
             cat << EOF > /etc/turnserver.conf
             listening-port=3478
-            realm=${STUNServerAddress}
+            realm=$(curl -s http://checkip.amazonaws.com)
             relay-ip=$(curl -s http://169.254.169.254/latest/meta-data/local-ipv4)
             external-ip=$(curl -s http://checkip.amazonaws.com)/$(curl -s http://169.254.169.254/latest/meta-data/local-ipv4)
             user=${UserName}:${Password}
@@ -211,10 +215,7 @@ Resources:
             fingerprint
             EOF
             systemctl enable coturn && systemctl restart coturn
-  ElasticIP:
-    Type: AWS::EC2::EIP
-    Properties:
-      Domain: "vpc"
+
   ElasticIPAssignment:
     Type: AWS::EC2::EIPAssociation
     Properties:
