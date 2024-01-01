@@ -138,3 +138,4 @@ Outputs:
     Value: !GetAtt TestInstance.PublicIp
     Export:
       Name: !Sub "${AWS::StackName}-PublicIp"
+      
