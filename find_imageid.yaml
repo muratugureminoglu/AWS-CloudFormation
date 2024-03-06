@@ -26,7 +26,7 @@ Resources:
   AMSGetLatestAMI:
     Type: AWS::Lambda::Function
     Properties:
-      Runtime: python3.11
+      Runtime: python3.12
       Handler: index.handler
       Role: !Sub ${DescribeImagesRole.Arn}
       Timeout: 60
@@ -60,7 +60,7 @@ Resources:
   UbuntuGetLatestAMI:
     Type: AWS::Lambda::Function
     Properties:
-      Runtime: python3.11
+      Runtime: python3.12
       Handler: index.handler
       Role: !Sub ${DescribeImagesRole.Arn}
       Timeout: 60
@@ -100,6 +100,14 @@ Resources:
       Name: "AntMedia-AWS-Marketplace-EE-*"
       Architecture: "x86_64"
 
+  AntMediaGPUAmi:
+    Type: Custom::FindAMI
+    Properties:
+      ServiceToken: !Sub ${AMSGetLatestAMI.Arn}
+      ProductId: "8kf9kapq2qbo37fuekp8k7o6r"
+      Name: "AntMedia-AWS-Marketplace-GPU-*"
+      Architecture: "x86_64"      
+
   UbuntuAmi:
     Type: Custom::FindAMI
     Properties:
@@ -107,3 +115,16 @@ Resources:
       Owner: "099720109477"
       Name: "ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-amd64-server-*"
       Architecture: "x86_64"
+
+Outputs:
+  AntMediaAmiId:
+    Description: The ID of the Ant Media AMI
+    Value: !Ref AntMediaAmi
+
+  AntMediaGPUAmiId:
+    Description: The ID of the Ant Media GPU AMI
+    Value: !Ref AntMediaGPUAmi
+
+  UbuntuAmiId:
+    Description: The ID of the Ubuntu AMI
+    Value: !Ref UbuntuAmi
