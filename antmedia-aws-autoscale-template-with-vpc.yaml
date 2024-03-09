@@ -62,7 +62,6 @@ Parameters:
       - r3.4xlarge
       - r3.8xlarge
     ConstraintDescription: must be a valid EC2 instance type.
-
   OriginInstanceType:
     Description: Ant Media Server Origin EC2 instance type
     Type: String
