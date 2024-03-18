@@ -1,0 +1,16 @@
+Resources:
+  MyServerlessCache:
+    Type: AWS::ElastiCache::ServerlessCache
+    Properties:
+      DailySnapshotTime: "03:00"
+      Description: "Redis Serverless Cache"
+      Engine: "Redis"
+      SecurityGroupIds: 
+        - sg-0e2be5622209d7798
+      ServerlessCacheName: "RedisServerlessCache"
+      SubnetIds: 
+        - subnet-0ccd2e5c863b5fbd7
+        - subnet-08423b9213e4c4e06
+      Tags: 
+        - Key: Name
+          Value: RedisCache
